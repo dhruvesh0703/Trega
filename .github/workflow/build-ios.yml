@@ -19,21 +19,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install iOS Capacitor Package
-        run: npm install @capacitor/ios
-
       - name: Build web assets
         run: npm run build
 
       - name: Force Add iOS Platform
         run: |
+          npm install @capacitor/ios
           rm -rf ios
           npx cap add ios
           npx cap sync ios
 
       - name: Build Unsigned iOS App
         run: |
-          xcodebuild -workspace ios/App/App.xcworkspace \
+          xcodebuild -project ios/App/App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
