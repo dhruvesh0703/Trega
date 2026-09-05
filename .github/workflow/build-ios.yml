@@ -1,7 +1,7 @@
 name: Build iOS IPA
 
 on:
-  workflow_dispatch: # This adds a manual "Run" button in GitHub
+  workflow_dispatch: 
 
 jobs:
   build-ios:
@@ -19,11 +19,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install iOS Capacitor Package
+        run: npm install @capacitor/ios
+
       - name: Build web assets
         run: npm run build
 
-      - name: Sync Capacitor for iOS
-        run: npx cap add ios
+      - name: Force Add iOS Platform
+        run: |
+          rm -rf ios
+          npx cap add ios
+          npx cap sync ios
 
       - name: Build Unsigned iOS App
         run: |
