@@ -4,7 +4,11 @@ const config: CapacitorConfig = {
   appId: 'in.trega.app',
   appName: 'Trega',
   webDir: 'dist',
-  bundledWebRuntime: false
+  bundledWebRuntime: false,
+  server: {
+    iosScheme: 'https',
+    androidScheme: 'https'
+  }
 };
 
 export default config;
