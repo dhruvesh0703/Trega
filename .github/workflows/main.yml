@@ -1,0 +1,50 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Sync Capacitor for iOS
+        run: npx cap sync ios
+
+      - name: Build Unsigned iOS App
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build \
+            CONFIGURATION_BUILD_DIR=$PWD/build
+
+      - name: Package into IPA
+        run: |
+          mkdir -p Payload
+          mv build/App.app Payload/
+          zip -r -9 TregaApp.ipa Payload
+          
+      - name: Upload IPA for Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trega-iOS-App
+          path: TregaApp.ipa
