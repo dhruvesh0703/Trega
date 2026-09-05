@@ -20,18 +20,35 @@ jobs:
         run: npm install
 
       - name: Build web assets
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: npm run build
 
-      - name: Force Add iOS Platform
+      - name: Generate Clean iOS Project
         run: |
-          npm install @capacitor/ios
+          # 1. Ensure all Capacitor tools are installed in the cloud
+          npm install @capacitor/ios @capacitor/cli @capacitor/core
+          
+          # 2. Delete any broken iOS folders to start fresh
           rm -rf ios
+          
+          # 3. Create a perfect iOS project and sync web files
           npx cap add ios
           npx cap sync ios
 
       - name: Build Unsigned iOS App
         run: |
-          xcodebuild -project ios/App/App.xcodeproj \
+          # 4. Smart Check: Auto-detect if we need Workspace or Project
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            echo "Workspace found! Using xcworkspace..."
+            export BUILD_TARGET="-workspace ios/App/App.xcworkspace"
+          else
+            echo "Workspace not found! Using xcodeproj..."
+            export BUILD_TARGET="-project ios/App/App.xcodeproj"
+          fi
+          
+          # 5. Run the Apple Xcode Compiler
+          xcodebuild $BUILD_TARGET \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
@@ -43,8 +60,21 @@ jobs:
 
       - name: Package into IPA
         run: |
+          # 6. Create the Payload folder required for IPAs
           mkdir -p Payload
-          mv build/App.app Payload/
+          
+          # 7. Dynamically find the App.app file wherever Xcode put it
+          APP_PATH=$(find . -name "App.app" -type d | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "CRITICAL ERROR: App.app was not generated!"
+            exit 1
+          fi
+          
+          echo "Success! Found App.app at: $APP_PATH"
+          
+          # 8. Move it and Zip it into the final .ipa file
+          mv "$APP_PATH" Payload/
           zip -r -9 TregaApp.ipa Payload
           
       - name: Upload IPA for Download
