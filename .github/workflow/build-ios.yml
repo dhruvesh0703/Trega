@@ -23,7 +23,7 @@ jobs:
         run: npm run build
 
       - name: Sync Capacitor for iOS
-        run: npx cap sync ios
+        run: npx cap add ios
 
       - name: Build Unsigned iOS App
         run: |
