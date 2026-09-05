@@ -1,0 +1,6 @@
+{
+  "name": "Trega - Hyperlocal Marketplace",
+  "description": "Enterprise-grade hyperlocal second-hand marketplace for neighborhoods and localities with feature-flag modular architecture, KYC verification, and escrow ledger.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

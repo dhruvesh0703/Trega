@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Trega Hyperlocal Marketplace API",
+    "version": "1.0.0",
+    "description": "API documentation for the Trega marketplace, including KYC, payments, and webhooks."
+  },
+  "servers": [
+    {
+      "url": "https://trega.in",
+      "description": "Production Server"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "System is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "time": {
+                      "type": "string"
+                    },
+                    "pendingKycCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cashfree/create-order": {
+      "post": {
+        "summary": "Initiate Cashfree Checkout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
+                  },
+                  "buyer_name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "customer_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "payment_session_id": {
+                      "type": "string"
+                    },
+                    "order_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cashfree/webhook": {
+      "post": {
+        "summary": "Cashfree Webhook Listener",
+        "responses": {
+          "200": {
+            "description": "Webhook received"
+          }
+        }
+      }
+    }
+  }
+}

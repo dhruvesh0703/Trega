@@ -1,0 +1,130 @@
+{
+  "project_id": "lithe-disk-8gbcx",
+  "collections": [
+    {
+      "name": "users",
+      "document_schema": {
+        "id": "string",
+        "name": "string",
+        "email": "string",
+        "phone": "string",
+        "avatar": "string",
+        "collegeOrArea": "string",
+        "locationId": "string",
+        "isKycVerified": "boolean",
+        "trustScore": "number",
+        "completedOrders": "number",
+        "joinedDate": "string",
+        "upiId": "string?"
+      }
+    },
+    {
+      "name": "listings",
+      "document_schema": {
+        "id": "string",
+        "title": "string",
+        "description": "string",
+        "price": "number",
+        "originalPrice": "number?",
+        "category": "string",
+        "condition": "string",
+        "images": "array<string>",
+        "videoUrl": "string?",
+        "sellerUpiId": "string?",
+        "locationId": "string",
+        "locationName": "string",
+        "locationArea": "string",
+        "lat": "number",
+        "lng": "number",
+        "seller": {
+          "id": "string",
+          "name": "string",
+          "avatar": "string"
+        },
+        "createdAt": "string",
+        "viewsCount": "number",
+        "isReserved": "boolean",
+        "isSold": "boolean",
+        "hasWarranty": "boolean",
+        "originalBillIncluded": "boolean",
+        "tags": "array<string>"
+      }
+    },
+    {
+      "name": "offers",
+      "document_schema": {
+        "id": "string",
+        "listingId": "string",
+        "listingTitle": "string",
+        "listingImage": "string",
+        "buyerId": "string",
+        "buyerName": "string",
+        "buyerAvatar": "string",
+        "sellerId": "string",
+        "sellerName": "string",
+        "originalPrice": "number",
+        "offeredPrice": "number",
+        "status": "string",
+        "message": "string",
+        "createdAt": "string"
+      }
+    },
+    {
+      "name": "questions",
+      "document_schema": {
+        "id": "string",
+        "listingId": "string",
+        "sellerId": "string",
+        "askedBy": {
+          "id": "string",
+          "name": "string"
+        },
+        "question": "string",
+        "createdAt": "string",
+        "answer": "map?",
+        "upvotesCount": "number?"
+      }
+    },
+    {
+      "name": "conversations",
+      "document_schema": {
+        "id": "string",
+        "listingId": "string",
+        "buyerId": "string",
+        "sellerId": "string",
+        "lastMessage": "string",
+        "lastMessageTime": "string",
+        "unreadCount": "number"
+      }
+    },
+    {
+      "name": "messages",
+      "document_schema": {
+        "id": "string",
+        "conversationId": "string",
+        "senderId": "string",
+        "text": "string",
+        "timestamp": "string"
+      }
+    },
+    {
+      "name": "orders",
+      "document_schema": {
+        "id": "string",
+        "listingId": "string",
+        "buyerId": "string",
+        "sellerId": "string",
+        "amount": "number",
+        "escrowStatus": "string",
+        "createdAt": "string"
+      }
+    },
+    {
+      "name": "KYC_Registry",
+      "document_schema": {
+        "userId": "string",
+        "verifiedAt": "string"
+      }
+    }
+  ]
+}

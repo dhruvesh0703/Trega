@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Trega</string>
+    <string name="title_activity_main">Trega</string>
+    <string name="package_name">in.trega.app</string>
+    <string name="custom_url_scheme">in.trega.app</string>
+</resources>

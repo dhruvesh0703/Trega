@@ -1,0 +1,1 @@
+src/vite-env.d.ts:11:declare module '*firebase-applet-config.json' { const value: any; export default value; }

@@ -1,0 +1,23 @@
+{
+  "hosting": {
+    "public": "dist",
+    "predeploy": [
+      "npm install",
+      "npm run build"
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "trega-pune-hyperlocal-marketplace",
+          "region": "asia-south1"
+        }
+      }
+    ]
+  }
+}
