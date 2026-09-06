@@ -65,6 +65,8 @@ import {
   onSnapshot,
   deleteDoc,
 } from "firebase/firestore";
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 export type SortOption = "NEAREST" | "PRICE_LOW" | "PRICE_HIGH" | "NEWEST";
 
@@ -410,31 +412,50 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [flags.isAuthEnabled, currentUser, isGuest]);
 
   // Send Firebase Phone OTP
-  const sendFirebasePhoneOtp = async (
-    phoneNumber: string,
-    appVerifier?: RecaptchaVerifier | null,
-  ): Promise<ConfirmationResult | null> => {
-    const formattedPhone = phoneNumber.startsWith("+")
-      ? phoneNumber
-      : `+91${phoneNumber.replace(/\D/g, "")}`;
-    if (!appVerifier) {
-      throw new Error("reCAPTCHA verifier not initialized");
-    }
+const sendFirebasePhoneOtp = async (
+  phoneNumber: string,
+  appVerifier?: RecaptchaVerifier | null,
+): Promise<ConfirmationResult | null> => {
+  const formattedPhone = phoneNumber.startsWith("+")
+    ? phoneNumber
+    : `+91${phoneNumber.replace(/\D/g, "")}`;
+    
+  // Handle Capacitor Native iOS/Android via FirebaseAuthentication plugin
+  if (Capacitor.isNativePlatform()) {
     try {
-      const confirmationResult = await signInWithPhoneNumber(
-        auth,
-        formattedPhone,
-        appVerifier,
-      );
+      const result = await FirebaseAuthentication.signInWithPhoneNumber({
+        phoneNumber: formattedPhone
+      });
       showToast(`SMS OTP sent to ${formattedPhone}`);
-      return confirmationResult;
+      return {
+        verificationId: result.verificationId,
+        confirm: async () => null // Handled differently in verify step
+      } as unknown as ConfirmationResult;
     } catch (error: any) {
-      console.error("Firebase Phone Auth Error:", error);
-      showToast("SMS Error: Failed to send SMS. Please try again.");
+      console.error("Native Firebase Phone Auth Error:", error);
+      showToast(`SMS Error: ${error.message || 'Failed to send SMS.'}`);
       throw error;
     }
-  };
+  }
 
+  // Handle Web/PWA via Standard JS SDK
+  if (!appVerifier) {
+    throw new Error("reCAPTCHA verifier not initialized");
+  }
+  try {
+    const confirmationResult = await signInWithPhoneNumber(
+      auth,
+      formattedPhone,
+      appVerifier,
+    );
+    showToast(`SMS OTP sent to ${formattedPhone}`);
+    return confirmationResult;
+  } catch (error: any) {
+    console.error("Firebase Phone Auth Error:", error);
+    showToast("SMS Error: Failed to send SMS. Please try again.");
+    throw error;
+  }
+};
   // Verify Firebase Phone OTP & Register or Login Profile
   const verifyFirebasePhoneOtp = async (
     confirmationResult: ConfirmationResult | null,
