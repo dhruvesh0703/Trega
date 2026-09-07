@@ -388,7 +388,7 @@ export const InAppMediaCaptureModal: React.FC<InAppMediaCaptureModalProps> = ({
  if (!isOpen) return null;
 
  return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center sm:p-6 bg-stone-950/90 backdrop-blur-md overflow-hidden">
+    <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-60 flex items-center justify-center sm:p-6 bg-stone-950/90 backdrop-blur-md overflow-hidden">
       <div className="bg-black sm:rounded-3xl w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-[420px] shadow-2xl flex flex-col relative overflow-hidden ring-1 ring-stone-800">
         
         {/* Header Bar */}

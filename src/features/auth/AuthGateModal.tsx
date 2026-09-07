@@ -17,7 +17,7 @@ export const AuthGateModal: React.FC = () => {
   // Fallback when Auth feature flag is disabled
   if (!flags.isAuthEnabled) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900 ">
+      <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex items-center justify-center p-4 bg-stone-900 ">
         <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-sm border border-stone-200 text-center">
           <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center mx-auto mb-4 font-bold shadow-sm"></div>
           <h3 className="text-xl font-bold text-stone-900 mb-1">
@@ -45,7 +45,7 @@ export const AuthGateModal: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-stone-50 overflow-y-auto">
+    <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex flex-col bg-stone-50 overflow-y-auto">
       <div className="flex flex-col w-full h-full relative p-4 pb-24 max-w-lg mx-auto justify-center">
         <AuthPage
           isModal

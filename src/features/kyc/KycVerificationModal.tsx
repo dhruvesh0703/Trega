@@ -21,7 +21,7 @@ export const KycVerificationModal: React.FC = () => {
   if (!currentUser) {
     return (
       
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={() => setActiveModal(null)} />
         <div className="relative bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl flex flex-col items-center">
           <ShieldCheck className="w-12 h-12 text-brand-500 mb-4" />
@@ -249,7 +249,7 @@ export const KycVerificationModal: React.FC = () => {
   return (
   <AnimatePresence>
     {activeModal === 'KYC' && (
-      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-stone-50 overflow-hidden shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.2)] md:rounded-t-[40px] md:top-10 md:inset-x-20">
+      <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex flex-col items-center justify-center bg-stone-50 overflow-hidden shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.2)] md:rounded-t-[40px] md:top-10 md:inset-x-20">
         <div className="relative w-full max-w-md bg-white rounded-3xl border border-stone-200 shadow-2xl flex flex-col max-h-[90vh]">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-stone-100">

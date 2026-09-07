@@ -1,84 +1,55 @@
 name: Build iOS IPA
-
 on:
-  workflow_dispatch: 
-
+  workflow_dispatch:
 jobs:
-  build-ios:
+  build:
     runs-on: macos-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v3
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: '22'
-
+          node-version: '20'
       - name: Install dependencies
-        run: npm install
-
-      - name: Build web assets
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: npm ci
+      - name: Build web app
         run: npm run build
-
       - name: Generate Clean iOS Project
         run: |
-          # 1. Ensure all Capacitor tools are installed in the cloud
           npm install @capacitor/ios @capacitor/cli @capacitor/core
-          
-          # 2. Delete any broken iOS folders to start fresh
           rm -rf ios
-          
-          # 3. Create a perfect iOS project and sync web files
           npx cap add ios
           npx cap sync ios
-
-      - name: Build Unsigned iOS App
+          cp GoogleService-Info.plist ios/App/App/
+          
+          # Inject Firebase configuration safely using Node.js
+          node -e "
+          const fs = require('fs');
+          const path = './ios/App/App/AppDelegate.swift';
+          let content = fs.readFileSync(path, 'utf8');
+          if (!content.includes('import FirebaseCore')) {
+            content = content.replace('import UIKit', 'import UIKit\nimport FirebaseCore');
+          }
+          if (!content.includes('FirebaseApp.configure()')) {
+            content = content.replace(
+              /func application\(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: \[UIApplication\.LaunchOptionsKey: Any\]\?\) -> Bool \{/,
+              'func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {\n        FirebaseApp.configure()'
+            );
+          }
+          fs.writeFileSync(path, content);
+          console.log('Successfully patched AppDelegate.swift');
+          "
+      - name: Install Cocoapods
         run: |
-          # 4. Smart Check: Auto-detect if we need Workspace or Project
-          if [ -d "ios/App/App.xcworkspace" ]; then
-            echo "Workspace found! Using xcworkspace..."
-            export BUILD_TARGET="-workspace ios/App/App.xcworkspace"
-          else
-            echo "Workspace not found! Using xcodeproj..."
-            export BUILD_TARGET="-project ios/App/App.xcodeproj"
-          fi
-          
-          # 5. Run the Apple Xcode Compiler
-          xcodebuild $BUILD_TARGET \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            build \
-            CONFIGURATION_BUILD_DIR=$PWD/build
-
-      - name: Package into IPA
+          cd ios/App
+          pod install
+      - name: Build IPA
         run: |
-          # 6. Create the Payload folder required for IPAs
-          mkdir -p Payload
-          
-          # 7. Dynamically find the App.app file wherever Xcode put it
-          APP_PATH=$(find . -name "App.app" -type d | head -n 1)
-          
-          if [ -z "$APP_PATH" ]; then
-            echo "CRITICAL ERROR: App.app was not generated!"
-            exit 1
-          fi
-          
-          echo "Success! Found App.app at: $APP_PATH"
-          
-          # 8. Move it and Zip it into the final .ipa file
-          mv "$APP_PATH" Payload/
-          zip -r -9 TregaApp.ipa Payload
-          
-      - name: Upload IPA for Download
-        uses: actions/upload-artifact@v4
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos -archivePath $PWD/build/App.xcarchive archive
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive -exportOptionsPlist App/exportOptions.plist -exportPath $PWD/build/ipa
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
         with:
-          name: Trega-iOS-App
-          path: TregaApp.ipa
+          name: app.ipa
+          path: ios/App/build/ipa/App.ipa

@@ -41,7 +41,7 @@ export const DisputeModal: React.FC = () => {
  // Fallback when Dispute flag is disabled per PRD
  if (!flags.isDisputeEnabled) {
  return (
- <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-stone-50 overflow-hidden">
+ <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex flex-col items-center justify-center bg-stone-50 overflow-hidden">
  <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-sm border border-stone-200 text-center">
  <div className="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-4 text-stone-500">
  <AlertTriangle className="w-6 h-6" />
@@ -75,7 +75,7 @@ export const DisputeModal: React.FC = () => {
 
  if (isWindowExpired) {
  return (
- <div className="fixed inset-0 z-50 flex flex-col bg-stone-50 overflow-y-auto">
+ <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex flex-col bg-stone-50 overflow-y-auto">
  <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-sm border border-stone-200 text-center space-y-4">
  <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
  <AlertTriangle className="w-7 h-7" />
@@ -115,7 +115,7 @@ export const DisputeModal: React.FC = () => {
  };
 
  return (
- <div className="fixed inset-0 z-50 flex flex-col bg-stone-50 overflow-y-auto">
+ <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex flex-col bg-stone-50 overflow-y-auto">
  <div className="flex flex-col w-full h-full relative p-4 sm:p-6 pb-24 max-w-lg mx-auto">
  <button
  onClick={() => setActiveModal(null)}

@@ -13,6 +13,7 @@ import {
  Navigation,
 } from 'lucide-react';
 import { useMarketplace } from '../../core/context/MarketplaceContext';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { RecaptchaVerifier, auth, db } from '../../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { ConfirmationResult } from 'firebase/auth';

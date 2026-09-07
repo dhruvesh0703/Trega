@@ -709,7 +709,7 @@ export const CreateListingModal: React.FC = () => {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex flex-col bg-white sm:bg-stone-900/60 sm:backdrop-blur-sm sm:p-6 sm:justify-center overflow-hidden">
+      <div className="fixed inset-0 z-50 flex flex-col bg-white sm:bg-stone-900/60 sm:backdrop-blur-sm sm:p-6 sm:justify-center overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex flex-col w-full h-full sm:h-[90vh] sm:max-h-[850px] relative sm:rounded-[2rem] max-w-[480px] mx-auto bg-white overflow-hidden sm:shadow-2xl p-6 sm:p-8">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}

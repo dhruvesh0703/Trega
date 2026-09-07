@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, setCurrentTab }) => 
  } = useMarketplace();
 
  return (
- <header className="sticky top-0 shrink-0 z-40 bg-white/70 backdrop-blur-3xl border-b border-white/60 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.1)]">
+ <header className="sticky top-0 shrink-0 z-40 bg-white/70 backdrop-blur-3xl border-b border-white/60 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.1)] pt-[env(safe-area-inset-top)]">
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Cool animated background glow */}
         <motion.div 

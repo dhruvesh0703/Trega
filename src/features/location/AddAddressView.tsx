@@ -235,7 +235,7 @@ export const AddAddressView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
         </div>
 
         {/* Footer Actions */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-stone-100 z-20">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-stone-100 z-20 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <button
             type="submit"
             form="add-address-form"

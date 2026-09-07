@@ -219,7 +219,7 @@ export const LegalPagesModal: React.FC = () => {
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }} 
-        className="fixed inset-0 z-50 flex flex-col bg-stone-50 overflow-y-auto"
+        className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex flex-col bg-stone-50 overflow-y-auto"
       >
         <div className="flex flex-col w-full h-full relative p-4 sm:p-6 pb-24 max-w-2xl mx-auto bg-white shadow-xl min-h-screen">
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-stone-100">

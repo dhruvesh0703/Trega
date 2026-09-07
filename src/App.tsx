@@ -44,7 +44,7 @@ const MainMarketplaceApp: React.FC = () => {
       <Header currentTab={currentTab} setCurrentTab={setCurrentTab as any} />
 
       {/* Main View Area */}
-      <main id="main-scroll-container" className="flex-1 overflow-y-auto pb-28 md:pb-8 relative scroll-smooth">
+      <main id="main-scroll-container" className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-8 relative scroll-smooth">
         <AnimatePresence mode="wait">
           {currentTab === 'FEED' && (
             <motion.div
@@ -100,7 +100,7 @@ const MainMarketplaceApp: React.FC = () => {
         {activeModal === "LOCATION_PICKER" && <LocationPickerModal key="LOCATION_PICKER" />}
         {activeModal === "LOCATION_PICKER_ADD" && <LocationPickerModal key="LOCATION_PICKER_ADD" />}
         {activeModal === "PROFILE" && (
-          <Suspense fallback={<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-8 h-8 rounded-full border-4 border-white/20 border-t-white animate-spin"></div></div>}>
+          <Suspense fallback={<div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] z-50 flex items-center justify-center bg-black/40"><div className="w-8 h-8 rounded-full border-4 border-white/20 border-t-white animate-spin"></div></div>}>
             <UserProfileModal key="PROFILE" />
           </Suspense>
         )}

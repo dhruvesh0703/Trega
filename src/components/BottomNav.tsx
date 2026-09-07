@@ -54,7 +54,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
  {/* Floating Action Button (FAB) for Listing Products - Placed outside above the bottom 3 menu in the corner */}
  {flags.isListingEnabled && (
  <motion.div 
-  className="md:hidden fixed bottom-[100px] right-4 z-50"
+  className="md:hidden fixed bottom-[100px] right-4 z-50 mb-[env(safe-area-inset-bottom)]"
   animate={{ y: isVisible ? 0 : 70 }}
   initial={false}
   transition={{ type: "spring", stiffness: 300, damping: 25 }}
@@ -77,7 +77,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
 
  {/* Bottom 3-Menu Navigation Bar */}
  <motion.div 
-  className="md:hidden fixed bottom-6 left-4 right-4 z-40 bg-white/75 backdrop-blur-3xl border border-white/60 rounded-3xl px-2 py-2 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.15)]"
+  className="md:hidden fixed bottom-6 left-4 right-4 z-40 bg-white/75 backdrop-blur-3xl border border-white/60 rounded-3xl px-2 py-2 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.15)] mb-[env(safe-area-inset-bottom)]"
   animate={{ y: isVisible ? 0 : 120, opacity: isVisible ? 1 : 0 }}
   initial={false}
   transition={{ type: "spring", stiffness: 300, damping: 25 }}

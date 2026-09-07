@@ -33,7 +33,7 @@ export const FloatingIconsBackground: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-[0] opacity-[0.04]">
+    <div className="fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-hidden pointer-events-none z-[0] opacity-[0.04]">
       {particles.map((p) => (
         <div
           key={p.id}

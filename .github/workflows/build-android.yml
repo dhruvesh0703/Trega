@@ -1,0 +1,92 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web assets
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: npm run build
+
+      - name: Generate Clean Android Project
+        run: |
+          # 1. Ensure all Capacitor tools are installed
+          npm install @capacitor/android @capacitor/cli @capacitor/core
+          
+          # 2. Delete any broken Android folders to start fresh
+          rm -rf android
+          
+          # 3. Create a perfect Android project and sync web files
+          npx cap add android
+          npx cap sync android
+          
+          # 4. Copy Firebase config into the new Android app if it exists
+          if [ -f "google-services.json" ]; then
+            cp google-services.json android/app/
+            echo "Successfully copied google-services.json to android/app/"
+          else
+            echo "Warning: google-services.json not found in root. Firebase Native may crash."
+          fi
+
+      - name: Inject Firebase Android Gradle Configuration
+        run: |
+          # The google-services plugin must be applied in the Android project.
+          # Update android/build.gradle dependencies
+          node -e "
+          const fs = require('fs');
+          const rootGradlePath = './android/build.gradle';
+          if (fs.existsSync(rootGradlePath)) {
+            let rootGradle = fs.readFileSync(rootGradlePath, 'utf8');
+            if (!rootGradle.includes('com.google.gms:google-services')) {
+              rootGradle = rootGradle.replace(
+                /dependencies\s*\{/,
+                'dependencies {\n        classpath \'com.google.gms:google-services:4.4.1\''
+              );
+              fs.writeFileSync(rootGradlePath, rootGradle);
+              console.log('Patched root build.gradle');
+            }
+          }
+          const appGradlePath = './android/app/build.gradle';
+          if (fs.existsSync(appGradlePath)) {
+            let appGradle = fs.readFileSync(appGradlePath, 'utf8');
+            if (!appGradle.includes('com.google.gms.google-services')) {
+              appGradle = appGradle + '\napply plugin: \'com.google.gms.google-services\'\n';
+              fs.writeFileSync(appGradlePath, appGradle);
+              console.log('Patched app build.gradle');
+            }
+          }
+          "
+
+      - name: Build Android APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK for Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trega-Android-App
+          path: android/app/build/outputs/apk/debug/app-debug.apk
