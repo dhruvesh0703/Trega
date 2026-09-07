@@ -24,8 +24,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          rm -rf package-lock.json node_modules
           npm install
-          npm rebuild esbuild rollup
 
       - name: Build web assets
         env:
