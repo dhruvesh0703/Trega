@@ -45,15 +45,10 @@ jobs:
           console.log('Successfully patched AppDelegate.swift');
           "
           
-      - name: Install Cocoapods
-        run: |
-          cd ios/App
-          pod install
-          
       - name: Build IPA
         run: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos -archivePath $PWD/build/App.xcarchive archive
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos -archivePath $PWD/build/App.xcarchive archive
           xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive -exportOptionsPlist App/exportOptions.plist -exportPath $PWD/build/ipa
           
       - name: Upload IPA
