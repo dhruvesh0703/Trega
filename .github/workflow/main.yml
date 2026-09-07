@@ -27,6 +27,21 @@ jobs:
           npx cap sync ios
           cp GoogleService-Info.plist ios/App/App/
           
+          # Link plist in Xcode using xcodeproj gem so Firebase doesn't crash
+          sudo gem install xcodeproj
+          ruby -e "
+          require 'xcodeproj'
+          project = Xcodeproj::Project.open('ios/App/App.xcodeproj')
+          app_group = project.main_group.find_subpath(File.join('App'), true)
+          unless app_group.files.any? { |f| f.path == 'GoogleService-Info.plist' }
+            file_ref = app_group.new_reference('GoogleService-Info.plist')
+            target = project.targets.first
+            target.resources_build_phase.add_file_reference(file_ref, true)
+            project.save
+            puts 'Successfully linked GoogleService-Info.plist to Xcode project'
+          end
+          "
+          
           # Inject Firebase configuration safely using Node.js
           node -e "
           const fs = require('fs');
