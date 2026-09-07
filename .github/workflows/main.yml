@@ -11,7 +11,9 @@ jobs:
         with:
           node-version: '20'
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm rebuild esbuild rollup
       - name: Build web app
         run: npm run build
       - name: Generate Clean iOS Project

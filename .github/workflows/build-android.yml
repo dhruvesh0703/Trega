@@ -23,7 +23,9 @@ jobs:
           java-version: '17'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm rebuild esbuild rollup
 
       - name: Build web assets
         env:
