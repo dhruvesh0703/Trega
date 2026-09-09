@@ -13,8 +13,8 @@ jobs:
           
       - name: Install dependencies
         run: |
-          rm -rf package-lock.json node_modules
           npm install
+          npm rebuild esbuild rollup
           
       - name: Build web app
         env:
@@ -30,44 +30,36 @@ jobs:
           
           # Auto-Generate GoogleService-Info.plist for iOS Firebase Native Auth
           cat << 'EOF' > ios/App/App/GoogleService-Info.plist
-          
           <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>CLIENT_ID</key>
-	<string>381942828602-o8a05n8jvl83gj9ebig797agf54b7lla.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.381942828602-o8a05n8jvl83gj9ebig797agf54b7lla</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>381942828602-raivhltj0pg6h8joradfdb955895p040.apps.googleusercontent.com</string>
-	<key>API_KEY</key>
-	<string>AIzaSyD7IklaIQhgpQrdaoGC4IMGjo-nKRh7XBU</string>
-	<key>GCM_SENDER_ID</key>
-	<string>381942828602</string>
-	<key>PLIST_VERSION</key>
-	<string>1</string>
-	<key>BUNDLE_ID</key>
-	<string>in.trega.app</string>
-	<key>PROJECT_ID</key>
-	<string>lithe-disk-8gbcx</string>
-	<key>STORAGE_BUCKET</key>
-	<string>lithe-disk-8gbcx.firebasestorage.app</string>
-	<key>IS_ADS_ENABLED</key>
-	<false></false>
-	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
-	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
-	<key>IS_GCM_ENABLED</key>
-	<true></true>
-	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
-	<key>GOOGLE_APP_ID</key>
-	<string>1:381942828602:ios:5853360712a299e88faf03</string>
-</dict>
-</plist>
-          
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>API_KEY</key>
+            <string>AIzaSyBVJdwJPCuu-Jkjmg_L79RmeXNCSUZnMlo</string>
+            <key>GCM_SENDER_ID</key>
+            <string>381942828602</string>
+            <key>PLIST_VERSION</key>
+            <string>1</string>
+            <key>BUNDLE_ID</key>
+            <string>in.trega.app</string>
+            <key>PROJECT_ID</key>
+            <string>lithe-disk-8gbcx</string>
+            <key>STORAGE_BUCKET</key>
+            <string>lithe-disk-8gbcx.firebasestorage.app</string>
+            <key>IS_ADS_ENABLED</key>
+            <false/>
+            <key>IS_ANALYTICS_ENABLED</key>
+            <false/>
+            <key>IS_APPINVITE_ENABLED</key>
+            <true/>
+            <key>IS_GCM_ENABLED</key>
+            <true/>
+            <key>IS_SIGNIN_ENABLED</key>
+            <true/>
+            <key>GOOGLE_APP_ID</key>
+            <string>1:381942828602:ios:5853360712a299e88faf03</string>
+          </dict>
+          </plist>
           EOF
           
           # Link plist in Xcode using xcodeproj gem so Firebase doesn't crash
@@ -85,37 +77,22 @@ jobs:
           end
           "
           
-          # Inject REVERSED_CLIENT_ID into Info.plist for Phone Auth
+          # Inject Encoded App ID into Info.plist for Phone Auth
           python3 -c "
-          import re, os
-          gs_path = './ios/App/App/GoogleService-Info.plist'
+          import os
           info_path = './ios/App/App/Info.plist'
-          if os.path.exists(gs_path) and os.path.exists(info_path):
-              with open(gs_path, 'r') as f:
-                  gs_content = f.read()
-              match = re.search(r'<key>REVERSED_CLIENT_ID</key>\s*<string>(.*?)</string>', gs_content)
-              if match:
-                  rev_id = match.group(1)
-                  with open(info_path, 'r') as f:
-                      info_content = f.read()
-                  if 'CFBundleURLTypes' not in info_content:
-                      url_types = (
-                          '\t<key>CFBundleURLTypes</key>\n'
-                          '\t<array>\n'
-                          '\t\t<dict>\n'
-                          '\t\t\t<key>CFBundleTypeRole</key>\n'
-                          '\t\t\t<string>Editor</string>\n'
-                          '\t\t\t<key>CFBundleURLSchemes</key>\n'
-                          '\t\t\t<array>\n'
-                          '\t\t\t\t<string>' + rev_id + '</string>\n'
-                          '\t\t\t</array>\n'
-                          '\t\t</dict>\n'
-                          '\t</array>'
-                      )
-                      info_content = info_content.replace('</dict>\n</plist>', url_types + '\n</dict>\n</plist>')
-                      with open(info_path, 'w') as f:
-                          f.write(info_content)
-                      print('Successfully injected REVERSED_CLIENT_ID into Info.plist')
+          encoded_app_id = 'app-1-381942828602-ios-5853360712a299e88faf03'
+          
+          if os.path.exists(info_path):
+              with open(info_path, 'r') as f:
+                  info_content = f.read()
+                  
+              if 'CFBundleURLTypes' not in info_content:
+                  url_types = f'''	<key>CFBundleURLTypes</key>\n	<array>\n		<dict>\n			<key>CFBundleTypeRole</key>\n			<string>Editor</string>\n			<key>CFBundleURLSchemes</key>\n			<array>\n				<string>{encoded_app_id}</string>\n			</array>\n		</dict>\n	</array>'''
+                  info_content = info_content.replace('</dict>\n</plist>', url_types + '\n</dict>\n</plist>')
+                  with open(info_path, 'w') as f:
+                      f.write(info_content)
+                  print('Successfully injected Encoded App ID into Info.plist')
           "
           
           # Inject Firebase configuration safely using Node.js
