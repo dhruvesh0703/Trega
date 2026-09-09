@@ -8,6 +8,12 @@ const config: CapacitorConfig = {
   server: {
     iosScheme: 'https',
     androidScheme: 'https'
+  },
+  plugins: {
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ["phone"]
+    }
   }
 };
 
