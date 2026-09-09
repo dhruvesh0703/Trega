@@ -52,22 +52,23 @@ jobs:
                   gs_content = f.read()
               match = re.search(r'<key>REVERSED_CLIENT_ID</key>\s*<string>(.*?)</string>', gs_content)
               if match:
-                  reversed_client_id = match.group(1)
+                  rev_id = match.group(1)
                   with open(info_path, 'r') as f:
                       info_content = f.read()
                   if 'CFBundleURLTypes' not in info_content:
-                      url_types = f'''
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>{reversed_client_id}</string>
-			</array>
-		</dict>
-	</array>'''
+                      url_types = (
+                          '\t<key>CFBundleURLTypes</key>\n'
+                          '\t<array>\n'
+                          '\t\t<dict>\n'
+                          '\t\t\t<key>CFBundleTypeRole</key>\n'
+                          '\t\t\t<string>Editor</string>\n'
+                          '\t\t\t<key>CFBundleURLSchemes</key>\n'
+                          '\t\t\t<array>\n'
+                          '\t\t\t\t<string>' + rev_id + '</string>\n'
+                          '\t\t\t</array>\n'
+                          '\t\t</dict>\n'
+                          '\t</array>'
+                      )
                       info_content = info_content.replace('</dict>\n</plist>', url_types + '\n</dict>\n</plist>')
                       with open(info_path, 'w') as f:
                           f.write(info_content)
