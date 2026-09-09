@@ -13,8 +13,8 @@ jobs:
           
       - name: Install dependencies
         run: |
-          rm -rf package-lock.json node_modules
-          npm install
+          npm ci
+          npm rebuild esbuild rollup
           
       - name: Build web app
         run: npm run build
@@ -42,6 +42,38 @@ jobs:
           end
           "
           
+          # Inject REVERSED_CLIENT_ID into Info.plist for Phone Auth
+          python3 -c "
+          import re, os
+          gs_path = './ios/App/App/GoogleService-Info.plist'
+          info_path = './ios/App/App/Info.plist'
+          if os.path.exists(gs_path) and os.path.exists(info_path):
+              with open(gs_path, 'r') as f:
+                  gs_content = f.read()
+              match = re.search(r'<key>REVERSED_CLIENT_ID</key>\s*<string>(.*?)</string>', gs_content)
+              if match:
+                  reversed_client_id = match.group(1)
+                  with open(info_path, 'r') as f:
+                      info_content = f.read()
+                  if 'CFBundleURLTypes' not in info_content:
+                      url_types = f'''
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>{reversed_client_id}</string>
+			</array>
+		</dict>
+	</array>'''
+                      info_content = info_content.replace('</dict>\n</plist>', url_types + '\n</dict>\n</plist>')
+                      with open(info_path, 'w') as f:
+                          f.write(info_content)
+                      print('Successfully injected REVERSED_CLIENT_ID into Info.plist')
+          "
+          
           # Inject Firebase configuration safely using Node.js
           node -e "
           const fs = require('fs');
@@ -63,10 +95,7 @@ jobs:
       - name: Build Unsigned IPA
         run: |
           cd ios/App
-          # Build archive with code signing strictly disabled
           xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos -archivePath $PWD/build/App.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive
-          
-          # Manually package the .app into an .ipa (bypassing exportArchive which requires certificates)
           mkdir -p build/Payload
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
           cd build

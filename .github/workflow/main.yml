@@ -10,12 +10,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          
       - name: Install dependencies
         run: |
           npm ci
           npm rebuild esbuild rollup
+          
       - name: Build web app
         run: npm run build
+        
       - name: Generate Clean iOS Project
         run: |
           npm install @capacitor/ios @capacitor/cli @capacitor/core
@@ -88,6 +91,7 @@ jobs:
           fs.writeFileSync(path, content);
           console.log('Successfully patched AppDelegate.swift');
           "
+          
       - name: Build Unsigned IPA
         run: |
           cd ios/App
@@ -96,6 +100,7 @@ jobs:
           cp -r build/App.xcarchive/Products/Applications/App.app build/Payload/
           cd build
           zip -qr app.ipa Payload
+          
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
