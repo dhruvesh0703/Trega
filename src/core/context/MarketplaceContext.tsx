@@ -486,12 +486,50 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({
         formattedPhone,
         appVerifier,
       );
+      showToast(`SMS OTP sent to ${formattedPhone}`);
       return confirmationResult;
     } catch (error: any) {
-      console.error("Web Firebase Phone Auth Error:", error);
+      console.error("Firebase Phone Auth Error:", error);
+      showToast("SMS Error: Failed to send SMS. Please try again.");
       throw error;
     }
   };
+
+  // Verify Firebase Phone OTP & Register or Login Profile
+  const verifyFirebasePhoneOtp = async (
+    confirmationResult: ConfirmationResult | null,
+    otpCode: string,
+    profileData?: {
+      name?: string;
+      avatar?: string;
+      localityName?: string;
+      locationId?: string;
+      isSignUp?: boolean;
+      phoneNumber?: string;
+    },
+  ): Promise<{ user: User; isNewUser: boolean }> => {
+    if (!confirmationResult) {
+      throw new Error("No live confirmation session found.");
+    }
+
+    let uid = "";
+    let verifiedPhone = "";
+
+    try {
+      const result = await confirmationResult.confirm(otpCode);
+      const fbUser = result.user;
+      uid = fbUser.uid;
+
+      if (fbUser.phoneNumber) {
+        verifiedPhone = fbUser.phoneNumber;
+      } else {
+        verifiedPhone = profileData?.phoneNumber || "";
+      }
+    } catch (err: any) {
+      console.error("OTP Validation error:", err);
+      showToast("Invalid OTP. Please check your SMS code.");
+      throw err;
+    }
 
     const phoneDigits = verifiedPhone.replace(/\D/g, "").slice(-10);
     const area = profileData?.localityName || userLocation.name;

@@ -1,0 +1,16 @@
+# Trega Hyperlocal Marketplace
+This file provides context for LLMs and AI Agents interacting with Trega.
+
+## Overview
+Trega is an enterprise-grade hyperlocal second-hand and peer-to-peer marketplace tailored specifically for the Pune university and neighborhood zones.
+
+## API Documentation
+Please refer to [/openapi.json](/openapi.json) for full API documentation.
+
+## Core Features
+- Trust Verification (KYC)
+- Escrow Checkout via Fastrr/Shiprocket
+- Geofenced Product Discovery
+- Public Q&A and Dispute Management
+
+If you are an agent, welcome!
