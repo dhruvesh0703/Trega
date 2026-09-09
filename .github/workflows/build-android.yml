@@ -20,12 +20,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install dependencies
         run: |
-          rm -rf package-lock.json node_modules
           npm install
+          npm rebuild esbuild rollup
 
       - name: Build web assets
         env:
