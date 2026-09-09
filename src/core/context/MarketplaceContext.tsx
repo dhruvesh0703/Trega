@@ -422,75 +422,76 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({
       
     // Handle Capacitor Native iOS/Android via FirebaseAuthentication plugin
     if (Capacitor.isNativePlatform()) {
-      try {
-        const result = await FirebaseAuthentication.signInWithPhoneNumber({
-          phoneNumber: formattedPhone
+      return new Promise((resolve, reject) => {
+        let codeSentListener: any;
+        let verificationCompletedListener: any;
+        let verificationFailedListener: any;
+
+        const cleanup = async () => {
+          if (codeSentListener) await codeSentListener.remove();
+          if (verificationCompletedListener) await verificationCompletedListener.remove();
+          if (verificationFailedListener) await verificationFailedListener.remove();
+        };
+
+        const setupListeners = async () => {
+          codeSentListener = await FirebaseAuthentication.addListener('phoneCodeSent', (event) => {
+            cleanup();
+            resolve({
+              verificationId: event.verificationId,
+              confirm: async (otpCode: string) => {
+                const res = await FirebaseAuthentication.confirmVerificationCode({
+                  verificationId: event.verificationId,
+                  verificationCode: otpCode
+                });
+                return { user: res.user } as any;
+              }
+            } as unknown as ConfirmationResult);
+          });
+
+          verificationCompletedListener = await FirebaseAuthentication.addListener('phoneVerificationCompleted', (event) => {
+            cleanup();
+            resolve({
+              verificationId: "auto-verified",
+              confirm: async () => ({ user: event.user }) as any
+            } as unknown as ConfirmationResult);
+          });
+
+          verificationFailedListener = await FirebaseAuthentication.addListener('phoneVerificationFailed', (event) => {
+            cleanup();
+            console.error("Native Firebase Phone Auth Failed:", event);
+            reject(new Error(event.message || 'Verification failed'));
+          });
+        };
+
+        setupListeners().then(() => {
+          FirebaseAuthentication.signInWithPhoneNumber({
+            phoneNumber: formattedPhone
+          }).catch(err => {
+            cleanup();
+            console.error("Native Firebase Phone Auth Error:", err);
+            reject(err);
+          });
         });
-        showToast(`SMS OTP sent to ${formattedPhone}`);
-        return {
-          verificationId: result.verificationId,
-          confirm: async () => null // Handled differently in verify step
-        } as unknown as ConfirmationResult;
-      } catch (error: any) {
-        console.error("Native Firebase Phone Auth Error:", error);
-        showToast(`SMS Error: ${error.message || 'Failed to send SMS.'}`);
-        throw error;
-      }
+      });
     }
 
     // Handle Web/PWA via Standard JS SDK
     if (!appVerifier) {
       throw new Error("reCAPTCHA verifier not initialized");
     }
+
     try {
       const confirmationResult = await signInWithPhoneNumber(
         auth,
         formattedPhone,
         appVerifier,
       );
-      showToast(`SMS OTP sent to ${formattedPhone}`);
       return confirmationResult;
     } catch (error: any) {
-      console.error("Firebase Phone Auth Error:", error);
-      showToast("SMS Error: Failed to send SMS. Please try again.");
+      console.error("Web Firebase Phone Auth Error:", error);
       throw error;
     }
   };
-
-  // Verify Firebase Phone OTP & Register or Login Profile
-  const verifyFirebasePhoneOtp = async (
-    confirmationResult: ConfirmationResult | null,
-    otpCode: string,
-    profileData?: {
-      name?: string;
-      avatar?: string;
-      localityName?: string;
-      locationId?: string;
-      isSignUp?: boolean;
-      phoneNumber?: string;
-    },
-  ): Promise<{ user: User; isNewUser: boolean }> => {
-    if (!confirmationResult) {
-      throw new Error("No live confirmation session found.");
-    }
-
-    let uid = "";
-    let verifiedPhone = "";
-
-    try {
-      const result = await confirmationResult.confirm(otpCode);
-      const fbUser = result.user;
-      uid = fbUser.uid;
-      if (fbUser.phoneNumber) {
-        verifiedPhone = fbUser.phoneNumber;
-      } else {
-        verifiedPhone = profileData?.phoneNumber || "";
-      }
-    } catch (err: any) {
-      console.error("OTP Validation error:", err);
-      showToast("Invalid OTP. Please check your SMS code.");
-      throw err;
-    }
 
     const phoneDigits = verifiedPhone.replace(/\D/g, "").slice(-10);
     const area = profileData?.localityName || userLocation.name;
